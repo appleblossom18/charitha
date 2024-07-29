@@ -1,0 +1,60 @@
+package JavaPackage;
+
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+
+import static io.restassured.RestAssured.*;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+public class GetRequest {
+	@BeforeTest
+	
+    public static void setup() {
+        RestAssured.baseURI = "https://petstore.swagger.io/v2";
+    }
+	
+	@Test
+	public void statuscode() {
+		//RestAssured.baseURI ="https://petstore.swagger.io/";
+		String response = given().queryParam("status", "sold").when().get("/pet/findByStatus").then().log().all().assertThat().statusCode(200).extract().response().asString();
+		JsonPath js1 = new JsonPath(response);
+		int count=	js1.getInt("tags.size()");
+		System.out.println("The count is "+count);
+		
+	}
+	
+	
+	
+		
+	@Test
+    public void testFindPetsByStatusAvailable() {
+        Response response = RestAssured.given()
+            .queryParam("status", "available")
+            .when()
+            .get("/pet/findByStatus");
+
+        Assert.assertEquals(response.getStatusCode(), 200, "Status code is not 200");
+
+        // Further assertions
+        Assert.assertTrue(response.jsonPath().getList("$").size() > 0, "No pets found with status 'available'");
+    }
+		
+	@Test
+    public void testFindPetsByStatusPending() {
+        Response response = RestAssured.given()
+            .queryParam("status", "pending")
+            .when()
+            .get("/pet/findByStatus");
+
+        Assert.assertEquals(response.getStatusCode(), 200, "Status code is not 200");
+
+        
+        Assert.assertTrue(response.jsonPath().getList("$").size() >= 0, "Unexpected number of pets found with status 'pending'");
+    
+	}
