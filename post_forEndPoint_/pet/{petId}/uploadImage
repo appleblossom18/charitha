@@ -1,0 +1,73 @@
+package JavaPackage;
+
+import static io.restassured.RestAssured.given;
+
+import java.io.File;
+
+import org.testng.Assert;
+import org.testng.annotations.*;
+
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
+import static io.restassured.RestAssured.*;
+
+public class NewRequest {
+	
+	@BeforeTest
+	public static void BaseURL() {
+		RestAssured.baseURI="https://petstore.swagger.io";
+		
+	}
+	
+	@Test
+	public void uplaodImageStatusCode() {
+       RequestSpecification response = RestAssured.given().log().all().multiPart("test",new File("C:\\Users\\chari\\Downloads\\istockphoto-1634311257-1024x1024.jpg"));
+		
+		String re = response.when().post("/v2/pet/1234/uploadImage").then().extract().contentType();
+		  //System.out.println(response.asString());
+		System.out.println(re);
+		
+	}
+	 @Test
+	 public void UploadImage() {
+	
+		 
+		        Response response = RestAssured.given()
+		                .pathParam("petId", 12356)
+		                .when()
+		                .post("/pet/{petId}/uploadImage");
+
+		        // Print the response for debugging
+		        System.out.println(response.asString());
+		        Assert.assertEquals(response.getStatusCode(), 404); // Assuming 404 for bad request
+		        Assert.assertTrue(response.getBody().asString().contains("required"));
+		 
+		 
+	/*JsonPath js1 = new JsonPath (re);
+	js1.get("message");*/
+	
+	 }
+	
+	 @Test
+	 public void CheckMessage() {
+		 File imageFile = new File("C:\\\\Users\\\\chari\\\\Downloads\\\\istockphoto-1634311257-1024x1024.jpg"); // Path to a test image
+
+	        Response response = RestAssured.given()
+	                .pathParam("petId", 1236) // Replace with an actual petId if necessary
+	                .multiPart("file", imageFile)
+	                .when()
+	                .post("/pet/{petId}/uploadImage");
+
+	        // Print the response for debugging
+	        System.out.println(response.asString());
+
+	        // Validate the response
+	        Assert.assertEquals(response.getStatusCode(), 200);
+	        Assert.assertTrue(response.getBody().asString().contains("successful"));
+	
+	 
+}
+}
